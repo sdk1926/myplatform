@@ -6,6 +6,10 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel='stylesheet' href="{% static 'styles.css' %}" />
+    <script
+      src="https://kit.fontawesome.com/6478f529f2.js"
+      crossorigin="anonymous"
+    ></script>
     <title>회원가입</title>
 </head>
 <body>
@@ -32,7 +36,8 @@
     <div class="pass">{{error}}</div>
     <input type="submit" value="회원가입">
     <div class="kakao">
-      <a href='https://kauth.kakao.com/oauth/authorize?client_id=f69e56958014d271373defb6cd2bbdc7&redirect_uri=http://127.0.0.1:8000/accounts/kakaologin/&response_type=code'>
+      <i class="fas fa-comment"></i>
+      <a href='{% url "kakaocode" %}'>
         카카오로 시작하기
       </a>
     </div>

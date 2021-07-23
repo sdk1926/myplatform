@@ -4,6 +4,7 @@ from .models import Accounts
 from django.db import transaction
 import requests
 
+REST_API_KEY = "f69e56958014d271373defb6cd2bbdc7"
 
 def index(request):
     message={}
@@ -87,17 +88,26 @@ def logout(request):
         return redirect('index')
     return redirect('index')
 
+def kakao_code(request):
+    return redirect(f'https://kauth.kakao.com/oauth/authorize?client_id=f69e56958014d271373defb6cd2bbdc7&redirect_uri=http://127.0.0.1:8000/accounts/kakaologin/&response_type=code')
 
 def kakao_signup(request):
-    AUTHORIZATION_CODE = request.GET.get('code',None)
-    REST_API_KEY = "f69e56958014d271373defb6cd2bbdc7"    
+    AUTHORIZATION_CODE = request.GET.get('code',None)    
     REDIRECT_URI = "http://127.0.0.1:8000/accounts/kakaologin/"
-    token_request = requests.post(f"https://kauth.kakao.com/oauth/token?grant_type=authorization_code&client_id={REST_API_KEY}&redirect_uri={REDIRECT_URI}&code={AUTHORIZATION_CODE}").json()
-    access_token = token_request['access_token']
+    kakao_token_api = "https://kauth.kakao.com/oauth/token"
+    data = {
+        'grant_type' : 'authorization_code',
+        'client_id' : REST_API_KEY,
+        'redirect_uri' : REDIRECT_URI,
+        'code' : AUTHORIZATION_CODE,
+    }
+    token_request = requests.post(kakao_token_api, data=data)
+    access_token = token_request.json()['access_token']
     kakao_user_info = requests.post("https://kapi.kakao.com/v2/user/me", headers={"Authorization" : f"Bearer {access_token}"},).json()
     kakaoid = kakao_user_info.get('id',None)
     kakaoid = int(kakaoid)
     kakaoaccounts = kakao_user_info.get('kakao_account')
+
     if Accounts.objects.filter(user_id=kakaoid).exists():
         user = Accounts.objects.get(user_id=kakaoid)
         request.session['user'] = user.user_id
